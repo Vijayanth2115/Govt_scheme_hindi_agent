@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hindi Govt Scheme Voice Assistant</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      max-width: 600px;
+      padding: 40px;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .header h1 {
+      color: #333;
+      font-size: 28px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .header p {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .video-container {
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      border-radius: 15px;
+      height: 300px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 30px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .avatar {
+      width: 120px;
+      height: 120px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 60px;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .avatar.recording {
+      animation: pulse 1.5s ease-in-out infinite;
+      border-color: #ff4757;
+      box-shadow: 0 0 30px rgba(255, 71, 87, 0.5);
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.1);
+      }
+    }
+
+    .status-badge {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      color: white;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .controls {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+
+    button {
+      padding: 15px 30px;
+      border: none;
+      border-radius: 50px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    button:not(:disabled):hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    #recordBtn {
+      background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+      color: white;
+    }
+
+    #stopBtn {
+      background: linear-gradient(135deg, #d63031 0%, #ff7675 100%);
+      color: white;
+    }
+
+    .audio-section {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 15px;
+      text-align: center;
+    }
+
+    .audio-section h3 {
+      color: #333;
+      margin-bottom: 15px;
+      font-size: 16px;
+    }
+
+    audio {
+      width: 100%;
+      outline: none;
+    }
+
+    audio::-webkit-media-controls-panel {
+      background: white;
+      border-radius: 10px;
+    }
+
+    .wave-animation {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .wave-animation.active {
+      opacity: 1;
+    }
+
+    .wave {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 2px;
+      animation: wave 1s ease-in-out infinite;
+    }
+
+    .wave:nth-child(1) { left: 40%; animation-delay: 0s; }
+    .wave:nth-child(2) { left: 45%; animation-delay: 0.1s; }
+    .wave:nth-child(3) { left: 50%; animation-delay: 0.2s; }
+    .wave:nth-child(4) { left: 55%; animation-delay: 0.1s; }
+    .wave:nth-child(5) { left: 60%; animation-delay: 0s; }
+
+    @keyframes wave {
+      0%, 100% {
+        height: 10px;
+      }
+      50% {
+        height: 50px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>
+        <span>🗣️</span>
+        सरकारी योजना वॉइस सहायक
+      </h1>
+      <p>अपनी आवाज़ से सरकारी योजनाओं की जानकारी पाएं</p>
+    </div>
+
+    <div class="video-container">
+      <div class="avatar" id="avatar">🤖</div>
+      <div class="status-badge" id="status">तैयार</div>
+      <div class="wave-animation" id="waveAnimation">
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button id="recordBtn">
+        <span>🎙️</span>
+        शुरू
+      </button>
+      <button id="stopBtn" disabled>
+        <span>⏹️</span>
+        रोकें
+      </button>
+    </div>
+
+    <div class="audio-section">
+      <h3>🔊 एआई का जवाब</h3>
+      <audio id="replyPlayer" controls></audio>
+    </div>
+  </div>
+
+  <script>
+    let recorder;
+    let chunks = [];
+    let sessionId = null;
+
+    const recordBtn = document.getElementById("recordBtn");
+    const stopBtn = document.getElementById("stopBtn");
+    const statusText = document.getElementById("status");
+    const replyPlayer = document.getElementById("replyPlayer");
+    const avatar = document.getElementById("avatar");
+    const waveAnimation = document.getElementById("waveAnimation");
+
+    recordBtn.onclick = async () => {
+      chunks = [];
+
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      recorder = new MediaRecorder(stream);
+
+      recorder.ondataavailable = e => chunks.push(e.data);
+
+      recorder.start();
+      statusText.innerText = "🎙️ रिकॉर्डिंग चल रही है...";
+      recordBtn.disabled = true;
+      stopBtn.disabled = false;
+    };
+
+    stopBtn.onclick = async () => {
+      recorder.stop();
+      statusText.innerText = "⏳ प्रोसेसिंग चल रही है...";
+
+      recorder.onstop = async () => {
+        const blob = new Blob(chunks);
+        const formData = new FormData();
+        formData.append("audio", blob, "input.mpeg");
+
+        if (sessionId) {
+          formData.append("session_id", sessionId);
+        }
+
+        const response = await fetch("http://127.0.0.1:8000/voice", {
+          method: "POST",
+          body: formData
+        });
+
+        if (!response.ok) {
+          statusText.innerText = "❌ सर्वर में त्रुटि";
+          recordBtn.disabled = false;
+          stopBtn.disabled = true;
+          return;
+        }
+
+        sessionId = response.headers.get("X-Session-ID");
+
+        const replyBlob = await response.blob();
+        const replyURL = URL.createObjectURL(replyBlob);
+
+        replyPlayer.src = replyURL;
+        
+        // Animation शुरू करें जब एजेंट बोलना शुरू करे
+        avatar.classList.add("recording");
+        waveAnimation.classList.add("active");
+        
+        replyPlayer.play();
+
+        statusText.innerText = "🤖 एजेंट ने जवाब दिया";
+        recordBtn.disabled = false;
+        stopBtn.disabled = true;
+        
+        // Animation बंद करें जब audio खत्म हो जाए
+        replyPlayer.onended = () => {
+          avatar.classList.remove("recording");
+          waveAnimation.classList.remove("active");
+        };
+      };
+    };
+  </script>
+</body>
+</html>
